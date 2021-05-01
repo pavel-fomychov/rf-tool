@@ -44,17 +44,6 @@ volatile long Cash2Rand = 0;            // кеш переменная для о
 volatile long Cash1 = 0;                // кеш переменная для отправки
 volatile long Cash2 = 0;                // кеш переменная для отправки
 int CashTrigger = 1;                    // переключение между перемеными кеша
-//Nero Radio
-volatile static byte neroCounter = 0;   // количество принятых битов
-volatile static long neroCode1 = 0;     // зашифрованная часть
-volatile static long neroCode2 = 0;     // фиксированная часть
-volatile long cn1 = 0;                  // переменная для отправки
-volatile long cn2 = 0;                  // переменная для отправки
-volatile long cashNero11 = 0;           // кеш переменная для отправки
-volatile long cashNero21 = 0;           // кеш переменная для отправки
-volatile long cashNero12 = 0;           // кеш переменная для отправки
-volatile long cashNero22 = 0;           // кеш переменная для отправки
-int cashNeroTrigger = 1;                // переключение между перемеными кеша
 //CAME
 volatile static byte cameCounter = 0;   // сохраненое количество бит
 volatile static long cameCode = 0;      // код Came
@@ -92,7 +81,7 @@ long rcTrigger = 1;                     // переключение между �
 //DISPLAY
 String displayTx = "";                  // кеш дисплея передача
 String displayRx = "";                  // кеш дисплея прием
-String displayClear = "true";           // первичная очистка дисплея
+boolean displayClear = true;           // первичная очистка дисплея
 int current_page = 0;
 int current_cell = 0;
 int count_cell = 69;
@@ -234,11 +223,7 @@ void click1() {
     if (eeprom_val_2 != 0 && eeprom_val_2 != -1) {
       digitalWrite(rxOn, LOW);                // Выкл перехват
       digitalWrite(ledCach1, HIGH);
-      if (bitRead(eeprom_val_2, 0) == 0 && bitRead(eeprom_val_2, 1) == 0 && bitRead(eeprom_val_2, 2) == 0 && bitRead(eeprom_val_2, 3) == 0 &&
-          bitRead(eeprom_val_2, 4) == 0 && bitRead(eeprom_val_2, 5) == 0 && bitRead(eeprom_val_2, 6) == 0 && bitRead(eeprom_val_2, 7) == 0) {
-        SendNeroRadio(eeprom_val_1, eeprom_val_2);
-      }
-      else if (eeprom_val_1 == 5012) SendCame(eeprom_val_2, false);
+      if (eeprom_val_1 == 5012) SendCame(eeprom_val_2, false);
       else if (eeprom_val_1 == 5024) SendCame(eeprom_val_2, true);
       else if (eeprom_val_1 == 6012) SendNice(eeprom_val_2, false);
       else if (eeprom_val_1 == 6024) SendNice(eeprom_val_2, true);
@@ -256,7 +241,7 @@ void click1() {
   } else {
     clickCash = 1;
     cachView();
-    if (Cash1 != 0 || cashCame1 != 0 || cashNice1 != 0 || cashNero12 != 0) {
+    if (Cash1 != 0 || cashCame1 != 0 || cashNice1 != 0) {
       digitalWrite(ledCach1, LOW);
       digitalWrite(ledCach2, HIGH);
     }
@@ -269,9 +254,6 @@ void click1() {
       }
       c2 = Cash1;
       SendANMotors(c1, c2);
-    }
-    if (cashNero12 != 0) {
-      SendNeroRadio(cashNero11, cashNero12);
     }
     if (cashCame1 != 0) {
       if (staticMode == 1) {
@@ -289,7 +271,7 @@ void click1() {
     }
     TxDisplay();
     digitalWrite(rxOn, HIGH);               // Вкл перехват
-    if (Cash1 != 0 || cashCame1 != 0 || cashNice1 != 0 || cashNero12 != 0) {
+    if (Cash1 != 0 || cashCame1 != 0 || cashNice1 != 0) {
       bipOne();
     }
     cachView();
@@ -300,14 +282,12 @@ void click1() {
 void doubleclick1() {
   clickCash = 2;
   cachView();
-  if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0 || cashNero22 != 0) {
+  if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0) {
     digitalWrite(ledCach1, LOW);
     digitalWrite(ledCach2, HIGH);
   }
   digitalWrite(rxOn, LOW);                // Выкл перехват
-  SendNeroRadio(0x2B390902, 0x040F9A00);
-  /*
-    if (Cash2 != 0) {
+  if (Cash2 != 0) {
     c1 = 0x25250000 + random(0xffff);
     if (staticMode == 1) {
       c1 = Cash2Rand;
@@ -316,10 +296,6 @@ void doubleclick1() {
     }
     c2 = Cash2;
     SendANMotors(c1, c2);
-    }
-  */
-  if (cashNero22 != 0) {
-    SendNeroRadio(cashNero21, cashNero22);
   }
   if (cashCame2 != 0) {
     if (staticMode == 1) {
@@ -337,7 +313,7 @@ void doubleclick1() {
   }
   TxDisplay();
   digitalWrite(rxOn, HIGH);               // Вкл перехват
-  if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0 || cashNero22 != 0) {
+  if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0) {
     bipTwo();
   }
   cachView();
@@ -366,40 +342,22 @@ void longPressStart1() {
     EEPROM.put(70, Cash2Rand);
     checkCash = 1;
   }
-  if (cashNero11 != 0) {
-    EEPROM.put(920, cashNero11);
-    checkCash = 1;
-  }
-  if (cashNero12 != 0) {
-    EEPROM.put(900, cashNero12);
-    checkCash = 1;
-  }
-  if (cashNero21 != 0) {
-    EEPROM.put(930, cashNero21);
-    checkCash = 1;
-  }
-  if (cashNero22 != 0) {
-    EEPROM.put(910, cashNero22);
-    checkCash = 1;
-  }
-  /*
-    if (cashCame1 != 0) {
+  if (cashCame1 != 0) {
     EEPROM.put(20, cashCame1);
     checkCash = 1;
-    }
-    if (cashCame2 != 0) {
+  }
+  if (cashCame2 != 0) {
     EEPROM.put(30, cashCame2);
     checkCash = 1;
-    }
-    if (cashNice1 != 0) {
+  }
+  if (cashNice1 != 0) {
     EEPROM.put(40, cashNice1);
     checkCash = 1;
-    }
-    if (cashNice2 != 0) {
+  }
+  if (cashNice2 != 0) {
     EEPROM.put(50, cashNice2);
     checkCash = 1;
-    }
-  */
+  }
 
   if (checkCash == 1) {
     clearDisplay();
@@ -481,22 +439,14 @@ void longPressStart2() {
     cashCame2 = 0;
     cashNice1 = 0;
     cashNice2 = 0;
-    cashNero11 = 0;
-    cashNero12 = 0;
-    cashNero21 = 0;
-    cashNero22 = 0;
     EEPROM.put(0, Cash1);
     EEPROM.put(10, Cash2);
     EEPROM.put(60, Cash1Rand);
     EEPROM.put(70, Cash2Rand);
-    EEPROM.put(920, cashNero11);
-    EEPROM.put(900, cashNero12);
-    EEPROM.put(930, cashNero21);
-    EEPROM.put(910, cashNero22);
-    //EEPROM.put(20, cashCame1);
-    //EEPROM.put(30, cashCame2);
-    //EEPROM.put(40, cashNice1);
-    //EEPROM.put(50, cashNice2);
+    EEPROM.put(20, cashCame1);
+    EEPROM.put(30, cashCame2);
+    EEPROM.put(40, cashNice1);
+    EEPROM.put(50, cashNice2);
     clearDisplay();
     oled.println("Ms: Cache is cleared");
     digitalWrite(ledCach1, LOW);
@@ -821,69 +771,6 @@ void SendANMotors(long c1, long c2) {
   }
 }
 
-//NERO-RADIO
-void SendNeroRadio(long cn1, long cn2) {
-  for (int j = 0; j < 5; j++)  {
-    //отправка 48 начальных импульсов
-    for (int i = 0; i < 48; i++) {
-      delayMicroseconds(pulseNR);
-      digitalWrite(txPin, HIGH);
-      delayMicroseconds(pulseNR);
-      digitalWrite(txPin, LOW);
-    }
-    delayMicroseconds(pulseNR);
-    digitalWrite(txPin, HIGH);
-    delayMicroseconds(pulseNR * 4);
-    digitalWrite(txPin, LOW);
-    delayMicroseconds(pulseNR);
-    //отправка информационой части кода
-    for (int i = 32; i > 0; i--) {
-      //SendBit(bitRead(cn1, i - 1), pulseNR);
-      if (bitRead(cn1, i - 1) == 0) {
-        digitalWrite(txPin, HIGH);        // 0
-        delayMicroseconds(pulseNR);
-        digitalWrite(txPin, LOW);
-        delayMicroseconds(pulseNR * 2);
-      }
-      else {
-        digitalWrite(txPin, HIGH);        // 1
-        delayMicroseconds(pulseNR * 2);
-        digitalWrite(txPin, LOW);
-        delayMicroseconds(pulseNR);
-      }
-    }
-    for (int i = 32; i > 0; i--) {
-      if (i > 8) {
-        //SendBit(bitRead(cn2, i - 1), pulseNR);
-        if (bitRead(cn2, i - 1) == 0) {
-          digitalWrite(txPin, HIGH);        // 0
-          delayMicroseconds(pulseNR);
-          digitalWrite(txPin, LOW);
-          delayMicroseconds(pulseNR * 2);
-        }
-        else {
-          digitalWrite(txPin, HIGH);        // 1
-          delayMicroseconds(pulseNR * 2);
-          digitalWrite(txPin, LOW);
-          delayMicroseconds(pulseNR);
-        }
-      }
-    }
-    if (j == 0) delayMicroseconds(pulseNR * 94);
-    if (j > 0) delayMicroseconds(pulseNR * 8);
-  }
-
-  if (switchMode == 2) {
-    displayTx = "";
-  } else {
-    displayTx = String(cn2, HEX);
-    displayTx.replace("00", "");
-    displayTx = "NR " + String(cn1, HEX) + displayTx;
-    displayTx.toUpperCase();
-    TxDisplay();
-  }
-}
-
 void SendBit(byte b, int pulse) {
   if (b == 0) {
     digitalWrite(txPin, HIGH);        // 0
@@ -1071,71 +958,6 @@ void grab() {
     }
   }
 
-  //NERO-RADIO
-  if (state == HIGH)  {
-    if (CheckValue(pulseNR, hilen) && CheckValue(pulseNR * 2, lolen)) {      // valid 1
-      if (neroCounter < 32)
-        neroCode1 = (neroCode1 << 1) | 1;
-      else if (neroCounter < 64)
-        neroCode2 = (neroCode2 << 1) | 1;
-      neroCounter++;
-    }
-    else if (CheckValue(pulseNR * 2, hilen) && CheckValue(pulseNR, lolen)) {  // valid 0
-      if (neroCounter < 32)
-        neroCode1 = (neroCode1 << 1) | 0;
-      else if (neroCounter < 64)
-        neroCode2 = (neroCode2 << 1) | 0;
-      neroCounter++;
-    }
-    else {
-      neroCounter = 0;
-      neroCode1 = 0;
-      neroCode2 = 0;
-    }
-    if (neroCounter >= 56)  {
-      for (int j = 0; j < 8; j++)  {
-        neroCode2 = (neroCode2 << 1) | 0;
-      }
-      if (switchMode == 2) {
-        Cash1SaveMode = neroCode1;
-        Cash2SaveMode = neroCode2;
-        displayRx = "SaveMode";
-      } else {
-        if (cashNeroTrigger == 1) {
-          if (String(cashNero22) != String(neroCode2)) {
-            cashNero12 = neroCode2;
-            cashNero11 = neroCode1;
-            cashNeroTrigger = 2;
-          }
-        } else {
-          if (String(cashNero12) != String(neroCode2)) {
-            cashNero22 = neroCode2;
-            cashNero21 = neroCode1;
-            cashNeroTrigger = 1;
-          }
-        }
-
-        if (String(cashNero12) == String(neroCode2)) {
-          cashNero11 = neroCode1;
-        }
-        if (String(cashNero22) == String(neroCode2)) {
-          cashNero21 = neroCode1;
-        }
-
-        displayRx = String(neroCode2, HEX);
-        displayRx.replace("00", "");
-        displayRx = "NR " + String(neroCode1, HEX) + displayRx;
-        displayRx.toUpperCase();
-        cachView();
-      }
-
-      neroCounter = 0;
-      neroCode1 = 0;
-      neroCode2 = 0;
-    }
-  }
-
-
   //CAME
   if (state == LOW) {
     if (CheckValue(320, hilen) && CheckValue(640, lolen)) {        // valid 1
@@ -1189,7 +1011,6 @@ void grab() {
           cashCameTrigger = 1;
         }
       }
-
       cachView();
     }
 
@@ -1253,7 +1074,6 @@ void grab() {
           cashNiceTrigger = 1;
         }
       }
-
       cachView();
     }
 
@@ -1352,13 +1172,7 @@ void getCodeEEPROM() {
         oled.print(num + 1);
         oled.print(": ");
         if (eeprom_val_2 != 0 && eeprom_val_2 != -1) {
-          if (bitRead(eeprom_val_2, 0) == 0 && bitRead(eeprom_val_2, 1) == 0 && bitRead(eeprom_val_2, 2) == 0 && bitRead(eeprom_val_2, 3) == 0 &&
-              bitRead(eeprom_val_2, 4) == 0 && bitRead(eeprom_val_2, 5) == 0 && bitRead(eeprom_val_2, 6) == 0 && bitRead(eeprom_val_2, 7) == 0) {
-            oled.print("Nero ");
-            oled.print(eeprom_val_1, HEX);
-            oled.print("   ");
-          }
-          else if (eeprom_val_1 == 5012) oled.print("Came 12bit");
+          if (eeprom_val_1 == 5012) oled.print("Came 12bit");
           else if (eeprom_val_1 == 5024) oled.print("Came 24bit");
           else if (eeprom_val_1 == 6012) oled.print("Nice 12bit");
           else if (eeprom_val_1 == 6024) oled.print("Nice 24bit");
@@ -1467,16 +1281,14 @@ void clearCodeEEPROM(int num_cell, int all_clear) {
 //Индикация
 
 void cachView() {
-  if (Cash1 != 0 || cashCame1 != 0 || cashNice1 != 0 || cashNero12 != 0) {
+  if (Cash1 != 0 || cashCame1 != 0 || cashNice1 != 0) {
     digitalWrite(ledCach1, HIGH);
   } else {
     EEPROM.get(0, Cash1);
     EEPROM.get(20, cashCame1);
-    EEPROM.get(900, cashNero12);
-    EEPROM.get(920, cashNero11);
-    //EEPROM.get(40, cashNice1);
-    //EEPROM.get(60, Cash1Rand);
-    if (Cash1 != 0 || cashCame1 != 0 || cashNice1 != 0 || cashNero12 != 0) {
+    EEPROM.get(40, cashNice1);
+    EEPROM.get(60, Cash1Rand);
+    if (Cash1 != 0 || cashCame1 != 0 || cashNice1 != 0) {
       digitalWrite(ledCach1, HIGH);
     } else {
       digitalWrite(ledCach1, LOW);
@@ -1485,17 +1297,15 @@ void cachView() {
       }
     }
   }
-  if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0 || cashNero22 != 0) {
+  if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0) {
     digitalWrite(ledCach1, HIGH);
     digitalWrite(ledCach2, HIGH);
   } else {
     EEPROM.get(10, Cash2);
     EEPROM.get(70, Cash2Rand);
-    EEPROM.get(910, cashNero22);
-    EEPROM.get(930, cashNero21);
-    //EEPROM.get(30, cashCame2);
-    //EEPROM.get(50, cashNice2);
-    if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0 || cashNero22 != 0) {
+    EEPROM.get(30, cashCame2);
+    EEPROM.get(50, cashNice2);
+    if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0) {
       digitalWrite(ledCach1, HIGH);
       digitalWrite(ledCach2, HIGH);
     } else {
@@ -1540,9 +1350,9 @@ void TxDisplay() {
 }
 
 void clearDisplay() {
-  if (displayClear == "true") {
+  if (displayClear) {
     oled.clear();
-    displayClear = "";
+    displayClear = false;
   }
 }
 
