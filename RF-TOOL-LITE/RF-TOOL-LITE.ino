@@ -13,7 +13,7 @@ SSD1306AsciiWire oled;
 #define btsendPin1 A1                   // кнопка 1
 #define btsendPin2 A2                   // кнопка 2
 #define bip A0                          // Вибро
-#define pulseAN 413                     // длительность импульса AN-Motors
+#define pulseAN 400                     // длительность импульса AN-Motors
 #define MAX_DELTA 200                   // максимальное отклонение от длительности при приеме
 
 OneButton button1(btsendPin1, false);   // вызов функции отслеживания кнопка 1
@@ -50,7 +50,7 @@ int cashNiceTrigger = 1;                // переключение между �
 //DISPLAY
 String displayTx = "";                  // кеш дисплея передача
 String displayRx = "";                  // кеш дисплея прием
-String displayClear = "true";           // первичная очистка дисплея
+boolean displayClear = true;            // первичная очистка дисплея
 
 unsigned long voltage = 0;              // процент заряда АКБ
 
@@ -559,9 +559,9 @@ void TxDisplay() {
 }
 
 void clearDisplay() {
-  if (displayClear == "true") {
+  if (displayClear) {
     oled.clear();
-    displayClear = "";
+    displayClear = false;
   }
 }
 
