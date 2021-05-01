@@ -7,7 +7,6 @@ SSD1306AsciiWire oled;
 RCSwitch mySwitch = RCSwitch();
 
 #define pulseAN 400
-#define pulseNR 200
 #define rxPin 2                         // Приемник
 #define rxOn 3                          // Включение приёмника
 #define txPin 4                         // Передатчик
