@@ -17,16 +17,16 @@ RCSwitch mySwitch = RCSwitch();
 #define btsendPin2 A2                   // кнопка 2
 #define btsendPin3 11                   // кнопка 3
 #define btsendPin4 10                   // кнопка 4
+#define bip A0                          // Вибро
+#define MAX_DELTA 200                   // максимальное отклонение от длительности при приеме
 boolean btnFlag3 = 1;                   // флаг для кнопка 3
 boolean btnFlag4 = 1;                   // флаг для кнопка 4
-int staticMode = 0;                     // флаг режима staticMode
-int switchMode = 0;                     // флаг режима switchMode
+int staticMode = 0;                     // номер режима staticMode
+int switchMode = 0;                     // номер режима switchMode
 OneButton button1(btsendPin1, false);   // вызов функции отслеживания кнопка 1
 OneButton button2(btsendPin2, false);   // вызов функции отслеживания кнопка 2
 OneButton button3(btsendPin3, false);   // вызов функции отслеживания кнопка 3
 OneButton button4(btsendPin4, false);   // вызов функции отслеживания кнопка 4
-#define bip A0                          // Вибро
-#define MAX_DELTA 200                   // максимальное отклонение от длительности при приеме
 
 volatile unsigned long prevtime;
 volatile unsigned int lolen, hilen, state;
@@ -80,7 +80,7 @@ long rcTrigger = 1;                     // переключение между �
 //DISPLAY
 String displayTx = "";                  // кеш дисплея передача
 String displayRx = "";                  // кеш дисплея прием
-boolean displayClear = true;           // первичная очистка дисплея
+boolean displayClear = true;            // первичная очистка дисплея
 int current_page = 0;
 int current_cell = 0;
 int count_cell = 69;
