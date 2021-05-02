@@ -18,7 +18,7 @@ RCSwitch mySwitch = RCSwitch();
 #define btsendPin3 11                   // кнопка 3
 #define btsendPin4 10                   // кнопка 4
 #define bip A0                          // Вибро
-#define MAX_DELTA 200                   // максимальное отклонение от длительности при приеме
+#define maxDelta 200                    // максимальное отклонение от длительности при приеме
 boolean btnFlag3 = 1;                   // флаг для кнопка 3
 boolean btnFlag4 = 1;                   // флаг для кнопка 4
 int staticMode = 0;                     // номер режима staticMode
@@ -109,7 +109,7 @@ void setup() {
     mySwitch.setRepeatTransmit(4);
     switchMode = 1;
   } else if (digitalRead(btsendPin4) == HIGH) {
-    attachInterrupt(0, grab, CHANGE);       // Перехват пакетов (1 для Pro Micro, 0 для Uno, Nano)
+    attachInterrupt(0, grab, CHANGE);       // Перехват пакетов ( 1 для Pro Micro | 0 для Uno, Nano, Pro Mini )
     randomSeed(analogRead(0));              // Генерация случайного числа для AN-Motors
 
     button1.attachClick(click1);
@@ -887,7 +887,7 @@ void SendNice(long Code, bool bit24) {
 //Прием
 
 boolean CheckValue(unsigned int base, unsigned int value) {
-  return ((value == base) || ((value > base) && ((value - base) < MAX_DELTA)) || ((value < base) && ((base - value) < MAX_DELTA)));
+  return ((value == base) || ((value > base) && ((value - base) < maxDelta)) || ((value < base) && ((base - value) < maxDelta)));
 }
 
 void grab() {
