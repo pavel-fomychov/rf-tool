@@ -14,7 +14,7 @@ SSD1306AsciiWire oled;
 #define btsendPin2 A2                   // кнопка 2
 #define bip A0                          // Вибро
 #define pulseAN 400                     // длительность импульса AN-Motors
-#define MAX_DELTA 200                   // максимальное отклонение от длительности при приеме
+#define maxDelta 200                    // максимальное отклонение от длительности при приеме
 
 OneButton button1(btsendPin1, false);   // вызов функции отслеживания кнопка 1
 OneButton button2(btsendPin2, false);   // вызов функции отслеживания кнопка 2
@@ -69,7 +69,7 @@ void setup() {
   pinMode(btsendPin2, INPUT);
 
   cachView();                             // Индикатор кеша, запрос кеша из EEPROM
-  attachInterrupt(0, grab, CHANGE);       // Перехват пакетов (1 для Pro Micro, 0 для Uno, Nano)
+  attachInterrupt(0, grab, CHANGE);       // Перехват пакетов ( 1 для Pro Micro | 0 для Uno, Nano, Pro Mini )
   randomSeed(analogRead(0));              // Генерация случайного числа для AN-Motors
 
   button1.attachClick(click1);
@@ -372,7 +372,7 @@ void SendNice(long Code) {
 //Прием
 
 boolean CheckValue(unsigned int base, unsigned int value) {
-  return ((value == base) || ((value > base) && ((value - base) < MAX_DELTA)) || ((value < base) && ((base - value) < MAX_DELTA)));
+  return ((value == base) || ((value > base) && ((value - base) < maxDelta)) || ((value < base) && ((base - value) < maxDelta)));
 }
 
 void grab() {
