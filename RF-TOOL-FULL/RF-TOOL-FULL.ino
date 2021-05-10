@@ -21,8 +21,8 @@ RCSwitch mySwitch = RCSwitch();
 #define maxDelta 200                    // максимальное отклонение от длительности при приеме
 boolean btnFlag3 = 1;                   // флаг для кнопка 3
 boolean btnFlag4 = 1;                   // флаг для кнопка 4
-int staticMode = 0;                     // номер режима staticMode
-int switchMode = 0;                     // номер режима switchMode
+volatile unsigned int staticMode = 0;                     // номер режима staticMode
+volatile unsigned int switchMode = 0;                     // номер режима switchMode
 OneButton button1(btsendPin1, false);   // вызов функции отслеживания кнопка 1
 OneButton button2(btsendPin2, false);   // вызов функции отслеживания кнопка 2
 OneButton button3(btsendPin3, false);   // вызов функции отслеживания кнопка 3
@@ -140,10 +140,6 @@ void setup() {
     button4.attachClick(click4);
     button4.attachDoubleClick(doubleclick4);
     button4.attachLongPressStart(longPressStart4);
-
-    if (digitalRead(btsendPin1) == HIGH) {
-      switchMode = 3;
-    }
   }
 
   oled.begin(&Adafruit128x64, 0x3C);
@@ -171,9 +167,10 @@ void setup() {
       oled.print(voltage);
       oled.println("%  ");
       lasttime = millis() + 60000;
+      if (switchMode == 1) delay(1000);
       if (switchMode == 2) delay(2000);
     }
-    if (analogRead(btsendPin1) > 550 || analogRead(btsendPin2) > 550 || digitalRead(btsendPin3) == HIGH || digitalRead(btsendPin4) == HIGH || switchMode == 2 || displayRx != "") {
+    if (analogRead(btsendPin1) > 550 || analogRead(btsendPin2) > 550 || digitalRead(btsendPin3) == HIGH || digitalRead(btsendPin4) == HIGH || switchMode == 2 || displayRx != "" ||mySwitch.available() ) {
       oled.setFont(font5x7);
       oled.setCursor(0, 0);
       if (switchMode == 2) {
@@ -1339,9 +1336,6 @@ void TxDisplay() {
       oled.print("Ms: ");
     } else {
       oled.print("Tx: ");
-    }
-    if (switchMode == 3) {
-      displayTx = "######## ########";
     }
     oled.println(displayTx);
     displayTx = "";
