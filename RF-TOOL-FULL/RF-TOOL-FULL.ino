@@ -170,7 +170,7 @@ void setup() {
       if (switchMode == 1) delay(1000);
       if (switchMode == 2) delay(2000);
     }
-    if (analogRead(btsendPin1) > 550 || analogRead(btsendPin2) > 550 || digitalRead(btsendPin3) == HIGH || digitalRead(btsendPin4) == HIGH || switchMode == 2 || displayRx != "" ||mySwitch.available() ) {
+    if (analogRead(btsendPin1) > 550 || analogRead(btsendPin2) > 550 || digitalRead(btsendPin3) == HIGH || digitalRead(btsendPin4) == HIGH || switchMode == 2 || displayRx != "" || mySwitch.available() ) {
       oled.setFont(font5x7);
       oled.setCursor(0, 0);
       if (switchMode == 2) {
@@ -815,7 +815,10 @@ void SendCame(long Code, bool bit24) {
       }
     }
     digitalWrite(txPin, LOW);
-    delayMicroseconds(11520);
+    if (bit24)
+      delayMicroseconds(23040);
+    else
+      delayMicroseconds(11520);
   }
 
   if (switchMode == 2) {
@@ -863,7 +866,10 @@ void SendNice(long Code, bool bit24) {
       }
     }
     digitalWrite(txPin, LOW);
-    delayMicroseconds(25200);
+    if (bit24)
+      delayMicroseconds(50400);
+    else
+      delayMicroseconds(25200);
   }
 
   if (switchMode == 2) {
