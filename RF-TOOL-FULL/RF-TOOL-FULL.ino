@@ -46,16 +46,12 @@ int CashTrigger = 1;                    // переключение между �
 //CAME
 volatile static byte cameCounter = 0;   // сохраненое количество бит
 volatile static long cameCode = 0;      // код Came
-volatile static long cameCode12 = 0;    // код Came 12bit
-volatile static long cameCode24 = 0;    // код Came 24bit
 volatile long cashCame1 = 0;            // кеш переменная для отправки
 volatile long cashCame2 = 0;            // кеш переменная для отправки
 int cashCameTrigger = 1;                // переключение между перемеными кеша
 //NICE
 volatile static byte niceCounter = 0;   // сохраненое количество бит
 volatile static long niceCode = 0;      // код Nice
-volatile static long niceCode12 = 0;    // код Nice 12bit
-volatile static long niceCode24 = 0;    // код Nice 24bit
 volatile long cashNice1 = 0;            // кеш переменная для отправки
 volatile long cashNice2 = 0;            // кеш переменная для отправки
 int cashNiceTrigger = 1;                // переключение между перемеными кеша
@@ -89,7 +85,7 @@ int count_page = 0;
 unsigned long voltage = 0;              // процент заряда АКБ
 
 void setup() {
-  //Serial.begin(9600);
+  Serial.begin(9600);
   pinMode(rxPin, INPUT);
   pinMode(txPin, OUTPUT);
   pinMode(rxOn, OUTPUT);
@@ -219,10 +215,8 @@ void click1() {
     if (eeprom_val_2 != 0 && eeprom_val_2 != -1) {
       digitalWrite(rxOn, LOW);                // Выкл перехват
       digitalWrite(ledCach1, HIGH);
-      if (eeprom_val_1 == 5012) SendCame(eeprom_val_2, false);
-      else if (eeprom_val_1 == 5024) SendCame(eeprom_val_2, true);
-      else if (eeprom_val_1 == 6012) SendNice(eeprom_val_2, false);
-      else if (eeprom_val_1 == 6024) SendNice(eeprom_val_2, true);
+      if (eeprom_val_1 == 5000) SendCame(eeprom_val_2);
+      else if (eeprom_val_1 == 6000) SendNice(eeprom_val_2);
       else {
         c1 = 0x25250000 + random(0xffff);
         c2 = eeprom_val_2;
@@ -252,18 +246,10 @@ void click1() {
       SendANMotors(c1, c2);
     }
     if (cashCame1 != 0) {
-      if (staticMode == 1) {
-        SendCame(cashCame1, true);
-      } else {
-        SendCame(cashCame1, false);
-      }
+      SendCame(cashCame1);
     }
     if (cashNice1 != 0) {
-      if (staticMode == 1) {
-        SendNice(cashNice1, true);
-      } else {
-        SendNice(cashNice1, false);
-      }
+      SendNice(cashNice1);
     }
     TxDisplay();
     digitalWrite(rxOn, HIGH);               // Вкл перехват
@@ -294,18 +280,10 @@ void doubleclick1() {
     SendANMotors(c1, c2);
   }
   if (cashCame2 != 0) {
-    if (staticMode == 1) {
-      SendCame(cashCame2, true);
-    } else {
-      SendCame(cashCame2, false);
-    }
+    SendCame(cashCame2);
   }
   if (cashNice2 != 0) {
-    if (staticMode == 1) {
-      SendNice(cashNice2, true);
-    } else {
-      SendNice(cashNice2, false);
-    }
+    SendNice(cashNice2);
   }
   TxDisplay();
   digitalWrite(rxOn, HIGH);               // Вкл перехват
@@ -408,11 +386,11 @@ void doubleclick2() {
   clearDisplay();
   if (staticMode == 0) {
     staticMode = 1;
-    oled.println("Ms: Static/24 ON");
+    oled.println("Ms: Static Mode ON");
     bipTwo();
   } else {
     staticMode = 0;
-    oled.println("Ms: Static/24 OFF");
+    oled.println("Ms: Static Mode OFF");
     bipTwo();
   }
   digitalWrite(ledJammer, LOW);
@@ -464,11 +442,7 @@ void click3() {
       digitalWrite(ledCach2, HIGH);
       cashCame1++;
       cashCame2++;
-      if (staticMode == 1) {
-        SendCame(cashCame1, true);
-      } else {
-        SendCame(cashCame1, false);
-      }
+      SendCame(cashCame1);
       bipOne();
     } else {
       clearDisplay();
@@ -494,11 +468,7 @@ void doubleclick3() {
       digitalWrite(ledCach2, HIGH);
       cashCame1--;
       cashCame2--;
-      if (staticMode == 1) {
-        SendCame(cashCame1, true);
-      } else {
-        SendCame(cashCame1, false);
-      }
+      SendCame(cashCame1);
       bipTwo();
     } else {
       clearDisplay();
@@ -535,11 +505,7 @@ void longPressStart3() {
       if (digitalRead(btsendPin3) == LOW && btnFlag3 == 1) {
         btnFlag3 = 0;
       }
-      if (staticMode == 1) {
-        SendCame(c, true);
-      } else {
-        SendCame(c, false);
-      }
+      SendCame(c);
       if (c == 0) {
         bipLong(false);
         digitalWrite(ledJammer, LOW);
@@ -564,11 +530,7 @@ void click4() {
       digitalWrite(ledCach2, HIGH);
       cashNice1++;
       cashNice2++;
-      if (staticMode == 1) {
-        SendNice(cashNice1, true);
-      } else {
-        SendNice(cashNice1, false);
-      }
+      SendNice(cashNice1);
       bipOne();
     } else {
       clearDisplay();
@@ -594,11 +556,7 @@ void doubleclick4() {
       digitalWrite(ledCach2, HIGH);
       cashNice1--;
       cashNice2--;
-      if (staticMode == 1) {
-        SendNice(cashNice1, true);
-      } else {
-        SendNice(cashNice1, false);
-      }
+      SendNice(cashNice1);
       bipTwo();
     } else {
       clearDisplay();
@@ -636,11 +594,7 @@ void longPressStart4() {
       if (digitalRead(btsendPin4) == LOW && btnFlag4 == 1) {
         btnFlag4 = 0;
       }
-      if (staticMode == 1) {
-        SendNice(n, true);
-      } else {
-        SendNice(n, false);
-      }
+      SendNice(n);
       if (n == 0) {
         bipLong(false);
         digitalWrite(ledJammer, LOW);
@@ -783,39 +737,31 @@ void SendBit(byte b, int pulse) {
 }
 
 //CAME
-void SendCame(long Code, bool bit24) {
+void SendCame(long Code) {
+  int bits = 12;
+  displayTx = String(Code, HEX);
+  displayTx.toUpperCase();
+  if (displayTx.length() > 3) bits = 24;
   for (int j = 0; j < 4; j++) {
     digitalWrite(txPin, HIGH);
     delayMicroseconds(320);
     digitalWrite(txPin, LOW);
-    for (int i = 12; i > 0; i--) {
+    for (int i = bits; i > 0; i--) {
       byte b = bitRead(Code, i - 1);
       if (b) {
         digitalWrite(txPin, LOW);     // 1
         delayMicroseconds(640);
         digitalWrite(txPin, HIGH);
         delayMicroseconds(320);
-        if (bit24) {
-          digitalWrite(txPin, LOW);
-          delayMicroseconds(640);
-          digitalWrite(txPin, HIGH);
-          delayMicroseconds(320);
-        }
       } else {
         digitalWrite(txPin, LOW);     // 0
         delayMicroseconds(320);
         digitalWrite(txPin, HIGH);
         delayMicroseconds(640);
-        if (bit24) {
-          digitalWrite(txPin, LOW);
-          delayMicroseconds(320);
-          digitalWrite(txPin, HIGH);
-          delayMicroseconds(640);
-        }
       }
     }
     digitalWrite(txPin, LOW);
-    if (bit24)
+    if (bits == 24)
       delayMicroseconds(23040);
     else
       delayMicroseconds(11520);
@@ -824,49 +770,41 @@ void SendCame(long Code, bool bit24) {
   if (switchMode == 2) {
     displayTx = "";
   } else {
-    if (bit24) {
-      displayTx = "Came 24bit " + String(Code & 0xfff);
+    if (bits == 24) {
+      displayTx = "Came 24bit " + displayTx;
     } else {
-      displayTx = "Came 12bit " + String(Code & 0xfff);
+      displayTx = "Came 12bit " + displayTx;
     }
     TxDisplay();
   }
 }
 
 //NICE
-void SendNice(long Code, bool bit24) {
+void SendNice(long Code) {
+  int bits = 12;
+  displayTx = String(Code, HEX);
+  displayTx.toUpperCase();
+  if (displayTx.length() > 3) bits = 24;
   for (int j = 0; j < 4; j++) {
     digitalWrite(txPin, HIGH);
     delayMicroseconds(700);
     digitalWrite(txPin, LOW);
-    for (int i = 12; i > 0; i--) {
+    for (int i = bits; i > 0; i--) {
       byte b = bitRead(Code, i - 1);
       if (b) {
         digitalWrite(txPin, LOW);     // 1
         delayMicroseconds(1400);
         digitalWrite(txPin, HIGH);
         delayMicroseconds(700);
-        if (bit24) {
-          digitalWrite(txPin, LOW);
-          delayMicroseconds(1400);
-          digitalWrite(txPin, HIGH);
-          delayMicroseconds(700);
-        }
       } else {
         digitalWrite(txPin, LOW);     // 0
         delayMicroseconds(700);
         digitalWrite(txPin, HIGH);
         delayMicroseconds(1400);
-        if (bit24) {
-          digitalWrite(txPin, LOW);
-          delayMicroseconds(700);
-          digitalWrite(txPin, HIGH);
-          delayMicroseconds(1400);
-        }
       }
     }
     digitalWrite(txPin, LOW);
-    if (bit24)
+    if (bits == 24)
       delayMicroseconds(50400);
     else
       delayMicroseconds(25200);
@@ -875,10 +813,12 @@ void SendNice(long Code, bool bit24) {
   if (switchMode == 2) {
     displayTx = "";
   } else {
-    if (bit24) {
-      displayTx = "Nice 24bit " + String(Code & 0xfff);
+    displayTx = String(Code, HEX);
+    displayTx.toUpperCase();
+    if (bits == 24) {
+      displayTx = "Nice 24bit " + displayTx;
     } else {
-      displayTx = "Nice 12bit " + String(Code & 0xfff);
+      displayTx = "Nice 12bit " + displayTx;
     }
     TxDisplay();
   }
@@ -963,53 +903,40 @@ void grab() {
   //CAME
   if (state == LOW) {
     if (CheckValue(320, hilen) && CheckValue(640, lolen)) {        // valid 1
-      cameCode12 = (cameCode12 << 1) | 1;
+      cameCode = (cameCode << 1) | 1;
       cameCounter++;
-      if (cameCounter % 2 == 0) {
-        cameCode24 = (cameCode24 << 1) | 1;
-      }
     }
     else if (CheckValue(640, hilen) && CheckValue(320, lolen)) {   // valid 0
-      cameCode12 = (cameCode12 << 1) | 0;
+      cameCode = (cameCode << 1) | 0;
       cameCounter++;
-      if (cameCounter % 2 == 0) {
-        cameCode24 = (cameCode24 << 1) | 0;
-      }
     }
     else {
       cameCounter = 0;
-      cameCode12 = 0;
-      cameCode24 = 0;
       cameCode = 0;
     }
   }
-  else if ((cameCounter == 12 || cameCounter == 24) && lolen > 1000 && (cameCode & 0xfff) != 0xfff) {
+  else if ((cameCounter == 12 || cameCounter == 24) && lolen > 1000) {
     if (switchMode == 2) {
-      if (cameCounter == 12 || cameCounter == 13) {
-        Cash1SaveMode = 5012; //Came 12bit
-        Cash2SaveMode = cameCode12;
-      } else {
-        Cash1SaveMode = 5024; //Came 24bit
-        Cash2SaveMode = cameCode24;
-      }
+      Cash1SaveMode = 5000;
+      Cash2SaveMode = cameCode;
       displayRx = "SaveMode";
     } else {
-      if (cameCounter == 12 || cameCounter == 13) {
-        cameCode = cameCode12;
-        displayRx = "Came 12bit " + String(cameCode & 0xfff);
+      displayRx = String(cameCode, HEX);
+      displayRx.toUpperCase();
+      if (cameCounter == 12) {
+        displayRx = "Came 12bit " + displayRx;
       } else {
-        cameCode = cameCode24;
-        displayRx = "Came 24bit " + String(cameCode & 0xfff);
+        displayRx = "Came 24bit " + displayRx;
       }
 
       if (cashCameTrigger == 1) {
-        if (String(cashCame2) != String(cameCode & 0xfff)) {
-          cashCame1 = cameCode & 0xfff;
+        if (String(cashCame2, HEX) != String(cameCode, HEX)) {
+          cashCame1 = cameCode;
           cashCameTrigger = 2;
         }
       } else {
-        if (String(cashCame1) != String(cameCode & 0xfff)) {
-          cashCame2 = cameCode & 0xfff;
+        if (String(cashCame1, HEX) != String(cameCode, HEX)) {
+          cashCame2 = cameCode;
           cashCameTrigger = 1;
         }
       }
@@ -1017,8 +944,6 @@ void grab() {
     }
 
     cameCounter = 0;
-    cameCode12 = 0;
-    cameCode24 = 0;
     cameCode = 0;
   }
 
@@ -1026,53 +951,40 @@ void grab() {
   //NICE
   if (state == LOW) {
     if (CheckValue(700, hilen) && CheckValue(1400, lolen)) {        // valid 1
-      niceCode12 = (niceCode12 << 1) | 1;
+      niceCode = (niceCode << 1) | 1;
       niceCounter++;
-      if (niceCounter % 2 == 0) {
-        niceCode24 = (niceCode24 << 1) | 1;
-      }
     }
     else if (CheckValue(1400, hilen) && CheckValue(700, lolen)) {   // valid 0
-      niceCode12 = (niceCode12 << 1) | 0;
+      niceCode = (niceCode << 1) | 0;
       niceCounter++;
-      if (niceCounter % 2 == 0) {
-        niceCode24 = (niceCode24 << 1) | 0;
-      }
     }
     else {
       niceCounter = 0;
-      niceCode12 = 0;
-      niceCode24 = 0;
       niceCode = 0;
     }
   }
-  else if ((niceCounter == 12 || niceCounter == 24) && lolen > 2000 && (niceCode & 0xfff) != 0xfff) {
+  else if ((niceCounter == 12 || niceCounter == 24) && lolen > 2000) {
     if (switchMode == 2) {
-      if (niceCounter == 12 || niceCounter == 13) {
-        Cash1SaveMode = 6012; //Nice 12bit
-        Cash2SaveMode = niceCode12;
-      } else {
-        Cash1SaveMode = 6024; //Nice 24bit
-        Cash2SaveMode = niceCode24;
-      }
+      Cash1SaveMode = 6000;
+      Cash2SaveMode = niceCode;
       displayRx = "SaveMode";
     } else {
-      if (niceCounter == 12 || niceCounter == 13) {
-        niceCode = niceCode12;
-        displayRx = "Nice 12bit " + String(niceCode & 0xfff);
+      displayRx = String(niceCode, HEX);
+      displayRx.toUpperCase();
+      if (niceCounter == 12) {
+        displayRx = "Nice 12bit " + displayRx;
       } else {
-        niceCode = niceCode24;
-        displayRx = "Nice 24bit " + String(niceCode & 0xfff);
+        displayRx = "Nice 24bit " + displayRx;
       }
 
       if (cashNiceTrigger == 1) {
-        if (String(cashNice2) != String(niceCode & 0xfff)) {
-          cashNice1 = niceCode & 0xfff;
+        if (String(cashNice2, HEX) != String(niceCode, HEX)) {
+          cashNice1 = niceCode;
           cashNiceTrigger = 2;
         }
       } else {
-        if (String(cashNice1) != String(niceCode & 0xfff)) {
-          cashNice2 = niceCode & 0xfff;
+        if (String(cashNice1, HEX) != String(niceCode, HEX)) {
+          cashNice2 = niceCode;
           cashNiceTrigger = 1;
         }
       }
@@ -1080,8 +992,6 @@ void grab() {
     }
 
     niceCounter = 0;
-    niceCode12 = 0;
-    niceCode24 = 0;
     niceCode = 0;
   }
 
