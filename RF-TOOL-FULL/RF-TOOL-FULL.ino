@@ -1084,12 +1084,11 @@ void getCodeEEPROM() {
         oled.print(num + 1);
         oled.print(": ");
         if (eeprom_val_2 != 0 && eeprom_val_2 != -1) {
-          if (eeprom_val_1 == 5000) oled.print("Came");
-          else if (eeprom_val_1 == 6000) oled.print("Nice");
+          if (eeprom_val_1 == 5000) oled.print("Came  ");
+          else if (eeprom_val_1 == 6000) oled.print("Nice  ");
           else oled.print("KeeLog");
           oled.print(" ");
-          if (eeprom_val_1 > 5010 && eeprom_val_1 < 6030) oled.print(eeprom_val_2 & 0xfff);
-          else oled.print(eeprom_val_2, HEX);
+          oled.print(eeprom_val_2, HEX);
           oled.println("               ");
         } else {
           oled.println("[-empty-cell-]    ");
