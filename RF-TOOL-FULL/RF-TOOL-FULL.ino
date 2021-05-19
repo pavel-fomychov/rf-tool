@@ -1084,10 +1084,8 @@ void getCodeEEPROM() {
         oled.print(num + 1);
         oled.print(": ");
         if (eeprom_val_2 != 0 && eeprom_val_2 != -1) {
-          if (eeprom_val_1 == 5012) oled.print("Came 12bit");
-          else if (eeprom_val_1 == 5024) oled.print("Came 24bit");
-          else if (eeprom_val_1 == 6012) oled.print("Nice 12bit");
-          else if (eeprom_val_1 == 6024) oled.print("Nice 24bit");
+          if (eeprom_val_1 == 5000) oled.print("Came");
+          else if (eeprom_val_1 == 6000) oled.print("Nice");
           else oled.print("KeeLog");
           oled.print(" ");
           if (eeprom_val_1 > 5010 && eeprom_val_1 < 6030) oled.print(eeprom_val_2 & 0xfff);
