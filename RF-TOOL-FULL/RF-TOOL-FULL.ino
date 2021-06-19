@@ -6,7 +6,7 @@ SSD1306AsciiWire oled;
 #include <RCSwitch.h>
 RCSwitch mySwitch = RCSwitch();
 
-#define pulseAN 400
+#define pulseAN 410
 #define rxPin 2                         // Приемник
 #define rxOn 3                          // Включение приёмника
 #define txPin 4                         // Передатчик
@@ -21,8 +21,8 @@ RCSwitch mySwitch = RCSwitch();
 #define maxDelta 200                    // максимальное отклонение от длительности при приеме
 boolean btnFlag3 = 1;                   // флаг для кнопка 3
 boolean btnFlag4 = 1;                   // флаг для кнопка 4
-volatile unsigned int staticMode = 0;                     // номер режима staticMode
-volatile unsigned int switchMode = 0;                     // номер режима switchMode
+volatile unsigned int staticMode = 0;   // номер режима staticMode
+volatile unsigned int switchMode = 0;   // номер режима switchMode
 OneButton button1(btsendPin1, false);   // вызов функции отслеживания кнопка 1
 OneButton button2(btsendPin2, false);   // вызов функции отслеживания кнопка 2
 OneButton button3(btsendPin3, false);   // вызов функции отслеживания кнопка 3
