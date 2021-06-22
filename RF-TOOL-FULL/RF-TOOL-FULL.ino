@@ -6,7 +6,7 @@ SSD1306AsciiWire oled;
 #include <RCSwitch.h>
 RCSwitch mySwitch = RCSwitch();
 
-#define pulseAN 410
+#define pulseAN 412
 #define rxPin 2                         // Приемник
 #define rxOn 3                          // Включение приёмника
 #define txPin 4                         // Передатчик
@@ -709,7 +709,7 @@ void SendANMotors(long c1, long c2) {
     //отправка бит, которые означают батарею и флаг повтора
     SendBit(1, pulseAN);
     SendBit(1, pulseAN);
-    delayMicroseconds(pulseAN * 39);
+    delayMicroseconds(pulseAN * 38);
   }
 
   if (switchMode == 2) {
