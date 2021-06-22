@@ -13,7 +13,7 @@ SSD1306AsciiWire oled;
 #define btsendPin1 A1                   // кнопка 1
 #define btsendPin2 A2                   // кнопка 2
 #define bip A0                          // Вибро
-#define pulseAN 400                     // длительность импульса AN-Motors
+#define pulseAN 412                     // длительность импульса AN-Motors
 #define maxDelta 200                    // максимальное отклонение от длительности при приеме
 
 OneButton button1(btsendPin1, false);   // вызов функции отслеживания кнопка 1
