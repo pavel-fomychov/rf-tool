@@ -1,3 +1,15 @@
+/*******************************************************************
+
+    RF-TOOL LITE version
+    https://github.com/pavel-fomychov/rf-tool
+    
+    Autor: Pavel Fomychov
+    YouTube: https://www.youtube.com/c/PavelFomychov
+    Instagram: https://www.instagram.com/pavel.fomychov/
+    Telegram: https://t.me/PavelFomychov
+    
+ *******************************************************************/
+ 
 #include <EEPROM.h>
 #include "OneButton.h"
 #include "SSD1306Ascii.h"
