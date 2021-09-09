@@ -228,6 +228,7 @@ void click1() {
     if (eeprom_val_2 != 0 && eeprom_val_2 != -1) {
       digitalWrite(rxOn, LOW);                // Выкл перехват
       digitalWrite(ledCach1, HIGH);
+      digitalWrite(ledCach2, LOW);
       if (eeprom_val_1 == 5000) SendCame(eeprom_val_2);
       else if (eeprom_val_1 == 6000) SendNice(eeprom_val_2);
       else {
@@ -241,10 +242,12 @@ void click1() {
       }
       bipOne();
       digitalWrite(ledCach1, LOW);
+      digitalWrite(ledCach2, LOW);
       digitalWrite(rxOn, HIGH);               // Вкл перехват
     } else {
       bipLong(true);
     }
+    cachView();
   } else {
     clickCash = 1;
     cachView();
@@ -280,19 +283,17 @@ void click1() {
 //Отправка кода из кеша 2
 void doubleclick1() {
   if (switchMode == 2) {
-    digitalWrite(ledJammer, HIGH);
-    digitalWrite(ledCach1, HIGH);
-    digitalWrite(ledCach2, HIGH);
     if (staticMode == 0) {
       staticMode = 1;
+      digitalWrite(ledCach1, HIGH);
+      digitalWrite(ledCach2, HIGH);
       bipTwo();
     } else {
       staticMode = 0;
+      digitalWrite(ledCach1, LOW);
+      digitalWrite(ledCach2, LOW);
       bipTwo();
     }
-    digitalWrite(ledJammer, LOW);
-    digitalWrite(ledCach1, LOW);
-    digitalWrite(ledCach2, LOW);
   } else {
     clickCash = 2;
     cachView();
@@ -1256,6 +1257,10 @@ void cachView() {
         displayTx = "No cache data 2";
       }
     }
+  }
+  if (switchMode == 2 && staticMode == 1) {
+    digitalWrite(ledCach1, HIGH);
+    digitalWrite(ledCach2, HIGH);
   }
 }
 
