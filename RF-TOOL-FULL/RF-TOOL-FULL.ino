@@ -2,14 +2,14 @@
 
     RF-TOOL FULL version
     https://github.com/pavel-fomychov/rf-tool
-    
+
     Autor: Pavel Fomychov
     YouTube: https://www.youtube.com/c/PavelFomychov
     Instagram: https://www.instagram.com/pavel.fomychov/
     Telegram: https://t.me/PavelFomychov
-    
+
  *******************************************************************/
- 
+
 #include <EEPROM.h>
 #include "OneButton.h"
 #include "SSD1306Ascii.h"
@@ -121,6 +121,7 @@ void setup() {
     randomSeed(analogRead(0));              // Генерация случайного числа для AN-Motors
 
     button1.attachClick(click1);
+    button1.attachDoubleClick(doubleclick1);
     button2.attachClick(click2);
     button2.attachLongPressStart(longPressStart2);
     button3.attachClick(click3);
@@ -230,7 +231,11 @@ void click1() {
       if (eeprom_val_1 == 5000) SendCame(eeprom_val_2);
       else if (eeprom_val_1 == 6000) SendNice(eeprom_val_2);
       else {
-        c1 = 0x25250000 + random(0xffff);
+        if (staticMode == 1) {
+          c1 = eeprom_val_1;
+        } else {
+          c1 = 0x25250000 + random(0xffff);
+        }
         c2 = eeprom_val_2;
         SendANMotors(c1, c2);
       }
@@ -274,35 +279,51 @@ void click1() {
 
 //Отправка кода из кеша 2
 void doubleclick1() {
-  clickCash = 2;
-  cachView();
-  if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0) {
-    digitalWrite(ledCach1, LOW);
+  if (switchMode == 2) {
+    digitalWrite(ledJammer, HIGH);
+    digitalWrite(ledCach1, HIGH);
     digitalWrite(ledCach2, HIGH);
-  }
-  digitalWrite(rxOn, LOW);                // Выкл перехват
-  if (Cash2 != 0) {
-    c1 = 0x25250000 + random(0xffff);
-    if (staticMode == 1) {
-      c1 = Cash2Rand;
+    if (staticMode == 0) {
+      staticMode = 1;
+      bipTwo();
     } else {
-      c1 = 0x25250000 + random(0xffff);
+      staticMode = 0;
+      bipTwo();
     }
-    c2 = Cash2;
-    SendANMotors(c1, c2);
+    digitalWrite(ledJammer, LOW);
+    digitalWrite(ledCach1, LOW);
+    digitalWrite(ledCach2, LOW);
+  } else {
+    clickCash = 2;
+    cachView();
+    if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0) {
+      digitalWrite(ledCach1, LOW);
+      digitalWrite(ledCach2, HIGH);
+    }
+    digitalWrite(rxOn, LOW);                // Выкл перехват
+    if (Cash2 != 0) {
+      c1 = 0x25250000 + random(0xffff);
+      if (staticMode == 1) {
+        c1 = Cash2Rand;
+      } else {
+        c1 = 0x25250000 + random(0xffff);
+      }
+      c2 = Cash2;
+      SendANMotors(c1, c2);
+    }
+    if (cashCame2 != 0) {
+      SendCame(cashCame2);
+    }
+    if (cashNice2 != 0) {
+      SendNice(cashNice2);
+    }
+    TxDisplay();
+    digitalWrite(rxOn, HIGH);               // Вкл перехват
+    if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0) {
+      bipTwo();
+    }
+    cachView();
   }
-  if (cashCame2 != 0) {
-    SendCame(cashCame2);
-  }
-  if (cashNice2 != 0) {
-    SendNice(cashNice2);
-  }
-  TxDisplay();
-  digitalWrite(rxOn, HIGH);               // Вкл перехват
-  if (Cash2 != 0 || cashCame2 != 0 || cashNice2 != 0) {
-    bipTwo();
-  }
-  cachView();
 }
 
 //Сохранение в энергонезависимую память EEPROM
