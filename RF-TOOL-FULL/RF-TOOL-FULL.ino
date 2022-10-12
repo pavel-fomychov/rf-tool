@@ -1039,9 +1039,9 @@ void rcSwitch() {
     btnFlag4 = 0;
   }
   if (mySwitch.available()) {
-    long valueSwitch = mySwitch.getReceivedValue();
-    long lengthSwitch = mySwitch.getReceivedBitlength();
-    long delaySwitch = mySwitch.getReceivedDelay();
+    uint32_t valueSwitch = mySwitch.getReceivedValue();
+    uint8_t lengthSwitch = mySwitch.getReceivedBitlength();
+    uint16_t delaySwitch = mySwitch.getReceivedDelay();
     if (valueSwitch != 0) {
       displayRx = String(valueSwitch) + " " + String(lengthSwitch) + "bit";
       if (rcTrigger == 1) {
